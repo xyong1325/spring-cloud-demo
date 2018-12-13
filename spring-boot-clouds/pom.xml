@@ -16,7 +16,8 @@
     </parent>
 
     <modules>
-        <module>spring-boot-eureka</module>
+        <module>spring-boot-eureka-server</module>
+        <module>spring-boot-eureka-client</module>
     </modules>
 
         <properties>
