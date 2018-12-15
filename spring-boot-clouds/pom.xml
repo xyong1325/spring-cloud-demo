@@ -18,6 +18,11 @@
     <modules>
         <module>spring-boot-eureka-server</module>
         <module>spring-boot-eureka-client</module>
+        <module>spring-boot-ribbon</module>
+        <module>spring-boot-ribbon-hystrix</module>
+        <module>spring-boot-ribbon-feign</module>
+        <module>spring-boot-ribbon-feign-hystrix</module>
+
     </modules>
 
         <properties>
