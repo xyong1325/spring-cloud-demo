@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.0.RELEASE</version>
+        <version>2.0.3.RELEASE</version>
         <relativePath/>
     </parent>
 
@@ -22,7 +22,7 @@
         <module>spring-boot-ribbon-hystrix</module>
         <module>spring-boot-ribbon-feign</module>
         <module>spring-boot-ribbon-feign-hystrix</module>
-
+        <module>spring-boot-zuul</module>
     </modules>
 
         <properties>
@@ -31,20 +31,17 @@
             <java.version>1.8</java.version>
             <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
         </properties>
-
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
             </dependency>
         </dependencies>
-
         <dependencyManagement>
             <dependencies>
                 <dependency>
