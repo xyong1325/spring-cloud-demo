@@ -20,13 +20,19 @@
    			<groupId>org.springframework.cloud</groupId>
    			<artifactId>spring-cloud-starter-openfeign</artifactId>
    		</dependency>
+   		
+     <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+     </dependency>
    	
 ```
  2.配置中心 application.properties 添加 配置
 ```properties
-    server.port=8764
-    spring.application.name=spring-boot-feign-ribbon
+    server.port=8766
+    spring.application.name=spring-boot-feign-ribbon-hystrix
     eureka.client.service-url.defaultZone=http://39.108.48.25:8761/eureka/
+    feign.hystrix.enabled=true
 ```
 
 3.编辑工程启动类SpringBootRibbonApplication
