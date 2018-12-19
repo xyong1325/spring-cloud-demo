@@ -1,0 +1,24 @@
+server:
+  port: 8889
+spring:
+  application:
+    name: spring-boot-config-bus-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/xyong1325/spring-cloud-demo.git     # 配置git仓库的地址
+          search-paths: spring-boot-clouds/config-res                # git仓库地址下的相对地址，可以配置多个，用,分割。
+          username:                                                   # git仓库的账号
+          password:                                                   # git仓库的密码
+      label: master
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://39.108.48.25:8761/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
+#      management.endpoints.web.exposure.include=bus-refresh

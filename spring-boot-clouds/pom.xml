@@ -16,13 +16,25 @@
     </parent>
 
     <modules>
+        <!--服务发现 与注册-->
         <module>spring-boot-eureka-server</module>
         <module>spring-boot-eureka-client</module>
+
+        <!--服务熔断 降级-->
         <module>spring-boot-ribbon</module>
         <module>spring-boot-ribbon-hystrix</module>
         <module>spring-boot-ribbon-feign</module>
         <module>spring-boot-ribbon-feign-hystrix</module>
+
+         <!--网关层-->
         <module>spring-boot-zuul</module>
+
+        <module>spring-boot-config-server</module>
+        <module>spring-boot-config-client</module>
+         <!--git 服务器 上刷新配置-->
+        <module>spring-boot-config-bus-server</module>
+        <module>spring-boot-config-bus-client</module>
+
     </modules>
 
         <properties>
