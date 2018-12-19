@@ -14,6 +14,5 @@ public class SpringBootConfigBusServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootConfigBusServerApplication.class, args);
 	}
-
 }
 
