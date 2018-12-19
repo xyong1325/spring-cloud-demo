@@ -69,4 +69,20 @@ public class SpringBootConfigBusServerApplication {
 	}
 }
 ```
+4.获取配置类 _@RefreshScope_  这个必须要加在使用类上面，否则无效
+```java
+
+@RefreshScope
+@RestController
+class HelloController {
+    @Value("${neo.hello}")
+    private String hello;
+
+    @RequestMapping("/hello")
+    public String from() {
+        return this.hello;
+    }
+}
+
+```
 
