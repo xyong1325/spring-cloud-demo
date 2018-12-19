@@ -51,7 +51,6 @@
     spring.rabbitmq.username=neo
     spring.rabbitmq.password=123456
     
-    
     spring.cloud.bus.enabled=true
     spring.cloud.bus.trace.enabled=true
     management.endpoints.web.exposure.include=bus-refresh
