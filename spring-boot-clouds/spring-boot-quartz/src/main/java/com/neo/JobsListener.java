@@ -7,15 +7,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Configuration
+/*@Configuration
 @EnableScheduling    //启动定时任务
-@Component
+@Component*/
 public class JobsListener {
 
-    @Autowired
+  /*  @Autowired
     public CronScheduler jobs;
     @Scheduled(cron="0 0 12 * * ?")
     public  void starJobs() throws  Exception {
         jobs.scheduleJobs();
-    }
+    }*/
 }

@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 public class SampleScheduler  {
 
 
-    /**
+/*    *//**
      * 创建定时任务
      * @return
-     */
+     *//*
     @Bean
    public JobDetail sampleJobDetail(){
         JobDataMap jobDataMap = new JobDataMap();
@@ -20,13 +20,13 @@ public class SampleScheduler  {
         return JobBuilder.newJob(SampleJob.class).usingJobData(jobDataMap).storeDurably().build();
     }
 
-    /**
+    *//**
      * 创建任务触发器
      * @return
-     */
+     *//*
     @Bean
     public Trigger  sampleJobTrigger(){
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(10).repeatForever();
         return  TriggerBuilder.newTrigger().forJob(sampleJobDetail()).withSchedule(scheduleBuilder).build();
-    }
+    }*/
 }

@@ -22,7 +22,6 @@ public class CronScheduler {
            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("0/6 * * * * ?");
            CronTrigger cronTrigger = TriggerBuilder.newTrigger().withSchedule(scheduleBuilder).build();
            scheduler.scheduleJob(jobDetail,cronTrigger);
-
    }
 
     private  void job2(Scheduler scheduler)  throws Exception{
@@ -37,6 +36,6 @@ public class CronScheduler {
     public  void scheduleJobs ()  throws Exception{
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         job1(scheduler);
-        job2(scheduler);
+       /* job2(scheduler);*/
     }
 }

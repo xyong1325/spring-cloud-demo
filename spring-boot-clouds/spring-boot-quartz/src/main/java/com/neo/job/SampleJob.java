@@ -16,7 +16,9 @@ public class SampleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap =   jobExecutionContext.getMergedJobDataMap();
-         System.out.println( " 参数--> "+ jobDataMap.values());
-         logger.info(" SampleJob 执行任务，任务时间：{ }");
+
+        System.out.println( " 参数--> "+ jobDataMap.values());
+
+        logger.info(" SampleJob 执行任务，任务时间：{ }");
     }
 }
