@@ -6,7 +6,7 @@ import java.util.List;
 public class Utils {
 
     public  static boolean  isEmpty(List list){
-        return  list == null || list.size() < 1 ;
+        return  null == list || list.size() < 1 ;
     }
     public  static boolean  isEmpty(String file){
         return file == null || "".equals(file);

@@ -1,23 +1,29 @@
-package com.neo.util;
+package com.neo.service.impl;
 
 import com.neo.domain.SheetEntity;
-import org.apache.poi.hssf.usermodel.*;
+import com.neo.service.IPOIService;
+import com.neo.util.Iterables;
+import com.neo.util.Utils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-public class POIUtil {
 
-
+public class POIService implements IPOIService {
     public  void insertRow(Row row, List<?> columns) {
         if (columns != null && columns.size() > 0) {
-            Iterables.forEach(columns,(index,item)-> row.createCell(index).setCellValue(String.valueOf(item)));
+            Iterables.forEach(columns,(index, item)-> row.createCell(index).setCellValue(String.valueOf(item)));
         }
     }
 
-    public   void  setFont(String fontName,int fontHeight,boolean boldWeightBold ,Workbook workbook , Cell cell){
-        CellStyle  cellStyle = workbook.createCellStyle();
+    public   void  setFont(String fontName, int fontHeight, boolean boldWeightBold , Workbook workbook , Cell cell){
+        CellStyle cellStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setFontName(fontName);
         font.setFontHeightInPoints((short)fontHeight);
@@ -116,7 +122,7 @@ public class POIUtil {
     public    Workbook createExcel(List<SheetEntity> sheetParams) {
         Workbook workbook = null;
         if (!Utils.isEmpty(sheetParams)) {
-             workbook = new HSSFWorkbook();
+            workbook = new HSSFWorkbook();
             Sheet sheet = null;
             for (SheetEntity sheetParam : sheetParams) {
                 sheet = workbook.createSheet(sheetParam.getSheetName());
@@ -129,5 +135,9 @@ public class POIUtil {
         }
         return workbook;
     }
+    public   byte[]  createExcels(String title,String sheetName ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow){
+      return null;
+    }
+
 
 }

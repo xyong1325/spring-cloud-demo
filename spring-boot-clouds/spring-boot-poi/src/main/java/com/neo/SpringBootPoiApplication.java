@@ -1,5 +1,7 @@
 package com.neo;
 
+import com.neo.service.IPOIService;
+import com.neo.service.impl.POIService;
 import com.neo.util.POIUtil;
 import com.neo.util.POIUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -41,44 +43,28 @@ public class SpringBootPoiApplication {
 		List<?> data2 =	 Arrays.asList(new String[]{"2","美丽金充值卡","名称","20","400","888"});
 		List<?> data3 =	 Arrays.asList(new String[]{"3","美丽金充值卡","名称","30","500","888"});
 
-		 String filePath="C:/test.xls";//文件路径
+		 String filePath="D:/test.xls";//文件路径
 		List<?> queryRows =  Arrays.asList( new String []{"门店：全部","支付方式：全部","本次搜索条件：全部","本次搜索条件99：全部99"} ) ;
 				//queryRows  = new ArrayList<>();
 		List<?> headerRows =	 Arrays.asList(new String[]{"排名","美丽金充值卡","名称","销售数量（订单数）","销售金额","惠z"});
 
-		String title = "787979" ;
+		List<?> summaryRow   =  Arrays.asList(new String[]{"汇总","","","150","1200",""});
+
+		String title = "9999" ;
 		List<List<?>> datas  = new ArrayList<>();
 		datas.add(data1);
 		datas.add(data2);
 		datas.add(data3);
 
-	 	HSSFWorkbook workbook = new HSSFWorkbook();
+	 /*	HSSFWorkbook workbook = new HSSFWorkbook();
 	  	HSSFSheet sheet  = workbook.createSheet("美丽金充值卡");
 	    POIUtils.setTitle(title,workbook,sheet,headerRows.size());
 	    POIUtils.setQueryRows(title,queryRows,workbook,sheet,headerRows.size());
-		POIUtils.setHeader(title,queryRows,headerRows,workbook,sheet);
+		POIUtils.setHeaderRow(title,queryRows,headerRows,workbook,sheet);
 		POIUtils.setDatas(title,queryRows,headerRows,datas,workbook,sheet);
-
-
-	//	POIUtils.setHeader()
-
-
-	/*List<?> header =	 Arrays.asList(new String[]{"排名","美丽金充值卡`名称","销售数量（订单数）","销售金额"});
-
-	  List<?> datas = new ArrayList<>();
-
-		Workbook  workbook =	POIUtils.create("梦圆皇宫",header,datas,"梦圆皇宫","dff");*/
-
-
-   /*
-		 sheet = workbook.createSheet("Test");//创建工作表(Sheet)
-		  row = sheet.createRow(0);
-		 cell =       row.createCell(0);
-		cell.setCellValue("xy");
-		row.createCell(1).setCellValue(false);
-		row.createCell(2).setCellValue( new Date());
-		row.createCell(3).setCellValue( 123);*/
-
+		POIUtils.setSummaryRow(title,queryRows,headerRows,datas,summaryRow,workbook,sheet);*/
+		IPOIService ipoiService = new POIService();
+	    Workbook workbook = ipoiService.createExcel(title,"美丽金充值卡",queryRows,headerRows,datas,summaryRow);
 		FileOutputStream out = new FileOutputStream(filePath);
 		workbook.write(out);//保存Excel文件
 		out.close();//关闭文件流

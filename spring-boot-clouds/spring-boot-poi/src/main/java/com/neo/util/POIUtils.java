@@ -1,45 +1,30 @@
 package com.neo.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.neo.service.LocaleMessageSourceService;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Footer;
-import org.apache.poi.ss.usermodel.Header;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
+
 public class POIUtils {
     // 大纲字体
     private static final short HEADER_FONT_SIZE = 16;
@@ -295,28 +280,7 @@ public class POIUtils {
         return wb;
     }
 
-    /**
-     * 移动行
-     *
-     * @param wb
-     * @param sheetName
-     * @param start     开始行
-     * @param end       结束行
-     * @param step      移动到那一行后(前) ,负数表示向前移动
-     *                  moveRow(wb,null,2,3,5); 把第2和3行移到第5行之后
-     *                  moveRow(wb,null,2,3,-1); 把第3行和第4行往上移动1行
-     * @return
-     */
-    public static Workbook moveRow(Workbook wb, String sheetName, int start, int end, int step) {
-        if (wb == null){
-            return null;
-        }
-        if (sheetName == null) {
-            sheetName = wb.getSheetAt(0).getSheetName();
-        }
-        wb.getSheet(sheetName).shiftRows(start, end, step);
-        return wb;
-    }
+
 
     public static Workbook setHeaderStyle(Workbook wb, String sheetName) {
         Font font = wb.createFont();
@@ -336,23 +300,7 @@ public class POIUtils {
         return wb;
     }
 
-    public static Workbook setHeaderOutline(Workbook wb, String sheetName, String title) {
-        if (wb == null) {
-            return null;
-        }
-        if (Utils.isEmpty(sheetName)) {
-            sheetName = wb.getSheetAt(0).getSheetName();
-        }
-        Header header = wb.getSheet(sheetName).getHeader();
-        StringBuilder  stringBuilder = new StringBuilder( HSSFHeader.startUnderline()).append(HSSFHeader.font("宋体", "Italic")).append("喜迎G20!").append(HSSFHeader.endUnderline());
-        header.setLeft(stringBuilder.toString());
-                        stringBuilder = new StringBuilder(HSSFHeader.fontSize(HEADER_FONT_SIZE)).append(HSSFHeader.startDoubleUnderline())
-                        .append( HSSFHeader.startBold()).append(title).append(HSSFHeader.endBold()).append(HSSFHeader.endDoubleUnderline());
-        header.setCenter(stringBuilder.toString());
-                        stringBuilder = new StringBuilder("时间:").append(HSSFHeader.date()).append(" ").append( HSSFHeader.time());
-        header.setRight(stringBuilder.toString());
-        return wb;
-    }
+
 
     public static Workbook setFooter(Workbook wb, String sheetName, String copyright) {
         if (wb == null){
@@ -388,9 +336,15 @@ public class POIUtils {
 
 
 
-    public static  void  setFont(String fontName,int fontHeight,boolean boldWeightBold ,HSSFWorkbook workbook , HSSFCell cell){
-        HSSFCellStyle  cellStyle = workbook.createCellStyle();
-        HSSFFont font = workbook.createFont();
+
+
+
+
+
+
+    public static  void  setFont(String fontName,int fontHeight,boolean boldWeightBold ,Workbook workbook , Cell cell){
+         CellStyle  cellStyle = workbook.createCellStyle();
+          Font font = workbook.createFont();
         font.setFontName(fontName);
         font.setFontHeightInPoints((short)fontHeight);
         if(boldWeightBold) {
@@ -401,10 +355,10 @@ public class POIUtils {
         cellStyle.setFont(font);
         cell.setCellStyle(cellStyle);
     }
-    public   static   void   setTitle(String title,HSSFWorkbook workbook ,HSSFSheet sheet,int lastCol ){
+    public   static   void   setTitle(String title, Workbook workbook ,Sheet sheet,int lastCol ){
         if(!Utils.isEmpty(title)) {
-            HSSFRow row = sheet.createRow(0);
-            HSSFCell cell = row.createCell(0);
+            Row row = sheet.createRow(0);
+            Cell cell = row.createCell(0);
             cell.setCellValue(title);
             setFont("华文行楷", 16, true, workbook, cell);
             CellRangeAddress rang = new CellRangeAddress(0, 0, 0, lastCol-1);
@@ -412,7 +366,7 @@ public class POIUtils {
         }
     }
 
-    public static  void setQueryRows(String title ,List<?> queryRows,HSSFWorkbook workbook ,HSSFSheet sheet, int lastCol){
+    public static  void setQueryRows(String title ,List<?> queryRows,Workbook workbook ,Sheet sheet, int lastCol){
         if(null != queryRows &&  queryRows.size() > 0 ) {
             int rowNum  = 0;
             if(!Utils.isEmpty(title)) {
@@ -420,27 +374,24 @@ public class POIUtils {
             }
             String cnt = "\r\n";
             StringBuilder content = new StringBuilder();
-            queryRows.forEach(item -> content.append(item).append(cnt));
-            HSSFRow row = sheet.createRow(rowNum);
-            HSSFCell cell = row.createCell(0);
-            HSSFCellStyle cellStyle = workbook.createCellStyle();
+            queryRows.forEach(item -> {
+                content.append(item).append(cnt);
+            });
+            Row row = sheet.createRow(rowNum);
+            Cell cell = row.createCell(0);
+             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setWrapText(true);
+           // setCellStyle(cellStyle);
             cell.setCellStyle(cellStyle);
-            cell.setCellValue(new HSSFRichTextString(content.toString()));
+            cell.setCellValue(new HSSFRichTextString(content.substring(0,content.length()-2)));
             CellRangeAddress rang = new CellRangeAddress(rowNum, (queryRows.size()+rowNum -1), 0, lastCol-1);
             sheet.addMergedRegion(rang);
         }
     }
-    public static void setHeader(String title ,List<?> queryRows ,List<?> headerRows,HSSFWorkbook wb ,HSSFSheet sheet){
+    public static void setHeaderRow(String title ,List<?> queryRows ,List<?> headerRows,Workbook wb ,Sheet sheet){
         if(headerRows!=null && headerRows.size() > 0 ){
-            int rowNum  = 0;
-            if(!Utils.isEmpty(title)) {
-                rowNum = rowNum +1;
-            }
-            if(queryRows!=null && queryRows.size() > 0 ){
-                rowNum += queryRows.size();
-            }
-                HSSFRow row = sheet.createRow(rowNum);
+            int rowNum  = getStartRow(title,queryRows,null,null,null);
+                 Row row = sheet.createRow(rowNum);
                 Iterables.forEach(headerRows,(index,item) -> {
                     row.createCell(index).setCellValue(String.valueOf(item));
                 });
@@ -448,23 +399,48 @@ public class POIUtils {
     }
 
 
-    public static  void setDatas(String title ,List<?> queryRows ,List<?> headerRows,List<?> datas,HSSFWorkbook wb ,HSSFSheet sheet){
-         int startRow = 0;
-        if(!Utils.isEmpty(title)) {
-            startRow = startRow +1;
-        }
-        if(queryRows!=null && queryRows.size() > 0 ){
-            startRow += queryRows.size();
-        }
-        if(headerRows!=null && headerRows.size() > 0 ){
-            startRow += 1;
-        }
+    private  static  int getStartRow(String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow){
+           int startRow = 0;
+            if(!Utils.isEmpty(title)) {
+                startRow += 1;
+            }
+            if(queryRows!=null && queryRows.size() > 0 ){
+                startRow += queryRows.size();
+            }
+            if(headerRow!=null && headerRow.size() > 0 ){
+                startRow += 1;
+            }
+            if(!Utils.isEmpty(datas)){
+                startRow += datas.size();
+            }
+            if(!Utils.isEmpty(summaryRow)){
+                startRow += 1;
+            }
+        return startRow;
+    }
+
+    public static  void setDatas(String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,Workbook wb ,Sheet sheet){
+         int startRow = getStartRow(title,queryRows,headerRow,null,null);
         for (int i = 0;  i< datas.size(); i++) {
             insertRow(sheet.createRow(i+ startRow),(List<?>)datas.get(i));
         }
-
+    }
+    public static  void setSummaryRow(String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow, Workbook wb , Sheet sheet){
+        if(!Utils.isEmpty(summaryRow)){
+            int startRow = getStartRow(title,queryRows,headerRow,datas,null);
+            insertRow(sheet.createRow(startRow),summaryRow);
+        }
     }
 
-
+    public static   Workbook createExcel(String title,String sheetName ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow){
+        Workbook workbook = new HSSFWorkbook();
+         Sheet sheet  = workbook.createSheet(sheetName);
+        setTitle(title,workbook,sheet,headerRow.size());
+        setQueryRows(title,queryRows,workbook,sheet,headerRow.size());
+        setHeaderRow(title,queryRows,headerRow,workbook,sheet);
+        setDatas(title,queryRows,headerRow,datas,workbook,sheet);
+        setSummaryRow(title,queryRows,headerRow,datas,summaryRow,workbook,sheet);
+        return workbook;
+    }
 
 }
