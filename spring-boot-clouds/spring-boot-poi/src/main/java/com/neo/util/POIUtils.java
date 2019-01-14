@@ -3,10 +3,10 @@ package com.neo.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.neo.service.LocaleMessageSourceService;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -20,9 +20,6 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
 import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFFooter;
-import org.apache.poi.hssf.usermodel.HSSFHeader;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -51,7 +48,7 @@ public class POIUtils {
 
     private static final int MEM_ROW  = 100;
 
-    public static Workbook createWorkbook(String file) {
+    public static Workbook createWorkbook() {
         Workbook wb = createSXSSFWorkbook(MEM_ROW);
         return wb;
     }
@@ -224,10 +221,7 @@ public class POIUtils {
 
     public static void insertRow(Row row, List<?> columns) {
         if (columns != null && columns.size() > 0) {
-            for (int j = 0; j < columns.size(); j++) {
-                Cell ceil = row.createCell(j);
-                ceil.setCellValue(String.valueOf(columns.get(j)));
-            }
+            Iterables.forEach(columns,(index,item)-> row.createCell(index).setCellValue(String.valueOf(item)));
         }
     }
 
@@ -377,19 +371,98 @@ public class POIUtils {
         return wb;
     }
 
-    public static Workbook create(String sheetNm, String file, List<?> header, List<?> data, String  title, String copyright) {
-        Workbook wb = createWorkbook(file);
+    public static Workbook create(String sheetNm, List<?> header, List<?> data, String  title, String copyright) {
+        Workbook wb = createWorkbook();
         if (Utils.isEmpty(sheetNm)) {
             sheetNm = wb.getSheetAt(0).getSheetName();
         }
-        setHeaderOutline(wb, sheetNm, title);
+      //  setHeaderOutline(wb, sheetNm, title);
         setHeader(wb, sheetNm, header);
-        setData(wb, sheetNm, 1, data);
+      //  setData(wb, sheetNm, 1, data);
         setFooter(wb, sheetNm, copyright);
         if (wb != null) {
             return wb;
         }
         return null;
+    }
+
+
+
+    public static  void  setFont(String fontName,int fontHeight,boolean boldWeightBold ,HSSFWorkbook workbook , HSSFCell cell){
+        HSSFCellStyle  cellStyle = workbook.createCellStyle();
+        HSSFFont font = workbook.createFont();
+        font.setFontName(fontName);
+        font.setFontHeightInPoints((short)fontHeight);
+        if(boldWeightBold) {
+            font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        }
+        cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        cellStyle.setFont(font);
+        cell.setCellStyle(cellStyle);
+    }
+    public   static   void   setTitle(String title,HSSFWorkbook workbook ,HSSFSheet sheet,int lastCol ){
+        if(!Utils.isEmpty(title)) {
+            HSSFRow row = sheet.createRow(0);
+            HSSFCell cell = row.createCell(0);
+            cell.setCellValue(title);
+            setFont("华文行楷", 16, true, workbook, cell);
+            CellRangeAddress rang = new CellRangeAddress(0, 0, 0, lastCol-1);
+            sheet.addMergedRegion(rang);
+        }
+    }
+
+    public static  void setQueryRows(String title ,List<?> queryRows,HSSFWorkbook workbook ,HSSFSheet sheet, int lastCol){
+        if(null != queryRows &&  queryRows.size() > 0 ) {
+            int rowNum  = 0;
+            if(!Utils.isEmpty(title)) {
+                rowNum = rowNum +1;
+            }
+            String cnt = "\r\n";
+            StringBuilder content = new StringBuilder();
+            queryRows.forEach(item -> content.append(item).append(cnt));
+            HSSFRow row = sheet.createRow(rowNum);
+            HSSFCell cell = row.createCell(0);
+            HSSFCellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setWrapText(true);
+            cell.setCellStyle(cellStyle);
+            cell.setCellValue(new HSSFRichTextString(content.toString()));
+            CellRangeAddress rang = new CellRangeAddress(rowNum, (queryRows.size()+rowNum -1), 0, lastCol-1);
+            sheet.addMergedRegion(rang);
+        }
+    }
+    public static void setHeader(String title ,List<?> queryRows ,List<?> headerRows,HSSFWorkbook wb ,HSSFSheet sheet){
+        if(headerRows!=null && headerRows.size() > 0 ){
+            int rowNum  = 0;
+            if(!Utils.isEmpty(title)) {
+                rowNum = rowNum +1;
+            }
+            if(queryRows!=null && queryRows.size() > 0 ){
+                rowNum += queryRows.size();
+            }
+                HSSFRow row = sheet.createRow(rowNum);
+                Iterables.forEach(headerRows,(index,item) -> {
+                    row.createCell(index).setCellValue(String.valueOf(item));
+                });
+            }
+    }
+
+
+    public static  void setDatas(String title ,List<?> queryRows ,List<?> headerRows,List<?> datas,HSSFWorkbook wb ,HSSFSheet sheet){
+         int startRow = 0;
+        if(!Utils.isEmpty(title)) {
+            startRow = startRow +1;
+        }
+        if(queryRows!=null && queryRows.size() > 0 ){
+            startRow += queryRows.size();
+        }
+        if(headerRows!=null && headerRows.size() > 0 ){
+            startRow += 1;
+        }
+        for (int i = 0;  i< datas.size(); i++) {
+            insertRow(sheet.createRow(i+ startRow),(List<?>)datas.get(i));
+        }
+
     }
 
 

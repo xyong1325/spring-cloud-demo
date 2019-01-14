@@ -3,10 +3,10 @@ package com.neo.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.neo.service.LocaleMessageSourceService;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -244,6 +244,34 @@ public class POIUtil {
         return cellStyle;
     }
 
+
+
+
+    public   static   void   setTitle(String title,HSSFWorkbook workbook ,HSSFSheet sheet){
+        HSSFRow row   = sheet.createRow(0);
+        HSSFCell cell =  	   row.createCell(0);
+        cell.setCellValue(title);
+        HSSFCellStyle  cellStyle = workbook.createCellStyle();
+        cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+
+
+        //字号
+
+        HSSFFont font = workbook.createFont();
+        //设置字体名称
+        font.setFontName("华文行楷");
+        //设置字号
+        font.setFontHeightInPoints((short)16);
+        //粗体显示
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        cellStyle.setFont(font);
+
+        cell.setCellStyle(cellStyle);
+        CellRangeAddress rang = new CellRangeAddress(0,0,0,5);
+
+        sheet.addMergedRegion(rang);
+    }
 
 
 
