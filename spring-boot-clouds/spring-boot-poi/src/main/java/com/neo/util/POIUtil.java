@@ -21,11 +21,11 @@ public class POIUtil {
         Font font = workbook.createFont();
         font.setFontName(fontName);
         font.setFontHeightInPoints((short)fontHeight);
-        if(boldWeightBold) {
+  /*      if(boldWeightBold) {
             font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         }
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);*/
         cellStyle.setFont(font);
         cell.setCellStyle(cellStyle);
     }

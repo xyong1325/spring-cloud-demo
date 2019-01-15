@@ -1,17 +1,37 @@
 package com.neo.service;
-
-import com.neo.domain.SheetEntity;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.util.List;
+ public interface IPOIService {
 
-public interface IPOIService {
+    /**
+     *
+     * @param columns
+     * @param rows
+     * @return
+     * @throws Exception
+     */
+    public  byte[] export(String[] columns, String[] rows) throws Exception ;
 
-    public Workbook createExcel(String title, String sheetName , List<?> queryRows , List<?> headerRow, List<?> datas, List<?> summaryRow);
+   /* public byte[] export(String title, String sheetName,String[] queryRows, List<?> headerRow, String [] datas, String [] summaryRow) throws Exception ;*/
 
-/*
+    /**
+     *
+     * @param title
+     * @param sheetName
+     * @param queryRows
+     * @param headerRow
+     * @param datas
+     * @param summaryRow
+     * @return
+     * @throws Exception
+     */
+    public byte[] export(String title, String sheetName,String[] queryRows, String [] headerRow, String [][] datas, String [] summaryRow) throws Exception ;
 
-    public    Workbook createExcel(List<SheetEntity> sheetParams);*/
+    public  Workbook demo2(String[] columns, String[] rows) throws Exception ;
 
-    public byte[] createExcels(String title, String sheetName, List<?> queryRows, List<?> headerRow, List<?> datas, List<?> summaryRow);
+
+   /* public  Workbook demo(String[] columns, String[][] rows) throws Exception ;
+
+    public  Workbook demo2(String[] columns, String[] rows) throws Exception ;*/
+
 }

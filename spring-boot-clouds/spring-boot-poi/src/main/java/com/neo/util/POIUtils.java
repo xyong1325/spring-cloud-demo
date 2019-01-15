@@ -114,7 +114,7 @@ public class POIUtils {
                 return  wb;
             }
             wb = WorkbookFactory.create(in);
-        } catch (InvalidFormatException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -285,7 +285,7 @@ public class POIUtils {
     public static Workbook setHeaderStyle(Workbook wb, String sheetName) {
         Font font = wb.createFont();
         CellStyle style = wb.createCellStyle();
-        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+      /*  font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);*/
         font.setFontHeightInPoints(FONT_HEIGHT_IN_POINTS);
         font.setFontName("黑体");
         style.setFont(font);
@@ -347,11 +347,11 @@ public class POIUtils {
           Font font = workbook.createFont();
         font.setFontName(fontName);
         font.setFontHeightInPoints((short)fontHeight);
-        if(boldWeightBold) {
+      /*  if(boldWeightBold) {
             font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         }
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);*/
         cellStyle.setFont(font);
         cell.setCellStyle(cellStyle);
     }
