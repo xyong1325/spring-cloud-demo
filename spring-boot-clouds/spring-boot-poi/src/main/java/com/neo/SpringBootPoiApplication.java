@@ -1,29 +1,12 @@
 package com.neo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.neo.domain.SheetVo;
-import com.neo.service.IPOIService;
 import com.neo.service.impl.POIService;
-import com.neo.util.POIUtil;
-import com.neo.util.POIUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.CellRange;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /*@SpringBootApplication*/
@@ -46,7 +29,7 @@ public class SpringBootPoiApplication {
 		List<?> data2 =	 Arrays.asList(new String[]{"2","美丽金充值卡","名称","20","400","888"});
 		List<?> data3 =	 Arrays.asList(new String[]{"3","美丽金充值卡","名称","30","500","888"});
 
-		 String filePath="c:/test.xlsx";//文件路径
+		 String filePath="d:/test.xlsx";//文件路径
 		List<?> queryRows =  Arrays.asList( new String []{"门店：全部","支付方式：全部","本次搜索条件：全部","本次搜索条件99：全部99"} ) ;
 				//queryRows  = new ArrayList<>();
 		List<?> headerRows =	 Arrays.asList(new String[]{"排名","美丽金充值卡","名称","销售数量（订单数）","销售金额","惠z"});
@@ -124,7 +107,7 @@ public class SpringBootPoiApplication {
 				"48,82966,深圳前海柏丽露纯生物科技有限公司,深圳,提供完整项目或提供商品,马明嘩,18998901617,2018-08-07,已到期,12.0个月,2017-09-01,2018-09-01,0天",
 				"49,82965,须要科技(深圳)有限公司,深圳,提供完整项目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月,2017-12-27,2019-12-27,346天"};
 
-	    Workbook workbook = ipoiService.demo2("梦圆皇宫","我是sheet",new String[]{"全部：全部","全部1：全部"}, new String []{"序号",
+	    Workbook workbook = ipoiService.demo2("","我是sheet",null, new String []{"序号",
 				"供应商ID",
 				"供应商名称",
 				"所在城市",

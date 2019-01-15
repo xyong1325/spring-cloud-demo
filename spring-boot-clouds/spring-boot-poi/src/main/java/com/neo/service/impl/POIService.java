@@ -5,35 +5,30 @@ import com.neo.domain.SheetVo;
 import com.neo.service.IPOIService;
 import com.neo.util.Iterables;
 import com.neo.util.Utils;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class POIService implements IPOIService {
 
-
-
-    private  void insertRow(Row row, List<?> columns) {
+    private  void insertRow(Workbook wb,Row row, List<?> columns) {
         if (columns != null && columns.size() > 0) {
-            Iterables.forEach(columns,(index, item)-> row.createCell(index).setCellValue(String.valueOf(item)));
+            Iterables.forEach(columns,(index, item)-> {
+                CellStyle cellStyle = wb.createCellStyle();
+                Cell cell = row.createCell(index);
+                cell.setCellValue(String.valueOf(item));
+                setBorder(cellStyle,cell);
+            });
         }
     }
-    private  void  setFont(String fontName, int fontHeight,boolean isCenter, boolean boldWeightBold , Workbook workbook , Cell cell){
-        CellStyle cellStyle = workbook.createCellStyle();
+    private  void  setFont(CellStyle cellStyle ,String fontName, int fontHeight,boolean isCenter, boolean boldWeightBold , Workbook workbook , Cell cell){
         Font font = workbook.createFont();
         font.setFontName(fontName);
         font.setFontHeightInPoints((short)fontHeight);
@@ -43,32 +38,34 @@ public class POIService implements IPOIService {
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         }
         cellStyle.setFont(font);
-        cell.setCellStyle(cellStyle);
+        setBorder(cellStyle,cell);
+
     }
 
-    private void setBorder(CellStyle cellStyle  ){
-       // cellStyle.setBorderColor();
-      //  cellStyle.setBorderColor(XSSFCellBorder.BorderSide.BOTTOM, XSSFColor.toXSSFColor(Col));
+    private void setBorder(CellStyle cellStyle,Cell cell){
         cellStyle.setBorderBottom(BorderStyle.THIN); //下边框
         cellStyle.setBorderLeft(BorderStyle.THIN);//左边框
         cellStyle.setBorderTop(BorderStyle.THIN);//上边框
         cellStyle.setBorderRight(BorderStyle.THIN);//右边框
-
+        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+        cellStyle.setLeftBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+        cellStyle.setRightBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+        cell.setCellStyle(cellStyle);
     }
 
-
-
-    private      void   setTitle(String title, Workbook workbook ,Sheet sheet,int lastCol ){
+    private   void   setTitle(String title, Workbook workbook ,Sheet sheet,int lastCol ){
         if(!Utils.isEmpty(title)) {
-            CellStyle cellStyle =  workbook.createCellStyle();
+            CellStyle cellStyle = null;
             Row row = sheet.createRow(0);
-            Cell cell = row.createCell(0);
-            cell.setCellValue(title);
-            setBorder(cellStyle);
-            cell.setCellStyle(cellStyle);
-            setFont("宋体", 16, true,true, workbook, cell);
-            CellRangeAddress rang = new CellRangeAddress(0, 0, 0, lastCol-1);
-            sheet.addMergedRegion(rang);
+            for (int i =0 ;i< lastCol; i++){
+                cellStyle =  workbook.createCellStyle();
+                Cell cell = row.createCell(i);
+                setFont(cellStyle,"宋体", 16, true,true, workbook, cell);
+                setBorder(cellStyle,cell);
+            }
+            row.getCell(0).setCellValue(title);
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, lastCol-1));
         }
     }
     private   void setQueryRows(String title ,List<?> queryRows,Workbook workbook ,Sheet sheet, int lastCol){
@@ -82,14 +79,18 @@ public class POIService implements IPOIService {
             queryRows.forEach(item -> {
                 content.append(item).append(cnt);
             });
-            Row row = sheet.createRow(rowNum);
-            Cell cell = row.createCell(0);
-            CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setWrapText(true);
-            cell.setCellStyle(cellStyle);
-            cell.setCellValue(new XSSFRichTextString(content.substring(0,content.length()-2)));
-            CellRangeAddress rang = new CellRangeAddress(rowNum, (queryRows.size()+rowNum -1), 0, lastCol-1);
-            sheet.addMergedRegion(rang);
+             for(int i = 0; i< (queryRows.size()+rowNum); i ++){
+                Row row = sheet.createRow(rowNum +i);
+                Cell cell =null;
+                for( int j = 0 ; j< lastCol ; j++){
+                    cell = row.createCell(j);
+                    CellStyle cellStyle = workbook.createCellStyle();
+                    cellStyle.setWrapText(true);
+                    setBorder(cellStyle,cell);
+                }
+            }
+            sheet.getRow(rowNum).getCell(0).setCellValue(new XSSFRichTextString(content.substring(0,content.length()-2)));
+            sheet.addMergedRegion(new CellRangeAddress(rowNum, (queryRows.size()+rowNum -1), 0, lastCol-1));
         }
     }
 
@@ -97,8 +98,11 @@ public class POIService implements IPOIService {
         if(headerRows!=null && headerRows.size() > 0 ){
             int rowNum  = getStartRow(title,queryRows,null,null,null);
             Row row = sheet.createRow(rowNum);
-            Iterables.forEach(headerRows,(index,item) -> {
-                row.createCell(index).setCellValue(String.valueOf(item));
+            Iterables.forEach(headerRows,(index, item)-> {
+                CellStyle cellStyle = wb.createCellStyle();
+                Cell cell = row.createCell(index);
+                cell.setCellValue(String.valueOf(item));
+                setBorder(cellStyle,cell);
             });
         }
     }
@@ -127,7 +131,7 @@ public class POIService implements IPOIService {
         if(!Utils.isEmpty(datas)){
             int startRow = getStartRow(title,queryRows,headerRow,null,null);
             for (int i = 0;  i< datas.size(); i++) {
-                insertRow(sheet.createRow(i+ startRow),(List<?>)datas.get(i));
+                insertRow(wb,sheet.createRow(i+ startRow),(List<?>)datas.get(i));
             }
         }
     }
@@ -135,7 +139,7 @@ public class POIService implements IPOIService {
     private   void setSummaryRow(String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow, Workbook wb , Sheet sheet){
         if(!Utils.isEmpty(summaryRow)){
             int startRow = getStartRow(title,queryRows,headerRow,datas,null);
-            insertRow(sheet.createRow(startRow),summaryRow);
+            insertRow(wb,sheet.createRow(startRow),summaryRow);
         }
     }
 
