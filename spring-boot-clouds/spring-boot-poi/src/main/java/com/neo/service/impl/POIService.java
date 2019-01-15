@@ -46,7 +46,7 @@ public class POIService implements IPOIService {
         cell.setCellStyle(cellStyle);
     }
 
-    private void setBorder(XSSFCellStyle cellStyle  ){
+    private void setBorder(CellStyle cellStyle  ){
        // cellStyle.setBorderColor();
       //  cellStyle.setBorderColor(XSSFCellBorder.BorderSide.BOTTOM, XSSFColor.toXSSFColor(Col));
         cellStyle.setBorderBottom(BorderStyle.THIN); //下边框
@@ -60,9 +60,12 @@ public class POIService implements IPOIService {
 
     private      void   setTitle(String title, Workbook workbook ,Sheet sheet,int lastCol ){
         if(!Utils.isEmpty(title)) {
+            CellStyle cellStyle =  workbook.createCellStyle();
             Row row = sheet.createRow(0);
             Cell cell = row.createCell(0);
             cell.setCellValue(title);
+            setBorder(cellStyle);
+            cell.setCellStyle(cellStyle);
             setFont("宋体", 16, true,true, workbook, cell);
             CellRangeAddress rang = new CellRangeAddress(0, 0, 0, lastCol-1);
             sheet.addMergedRegion(rang);
