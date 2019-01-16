@@ -21,5 +21,11 @@ public class Utils {
             return Arrays.asList(rows);
         }
     }
-
+    public static List<Integer> asList(Integer [] rows){
+        if(rows == null || rows.length <1 ){
+            return new ArrayList<>();
+        }else{
+            return Arrays.asList(rows);
+        }
+    }
 }

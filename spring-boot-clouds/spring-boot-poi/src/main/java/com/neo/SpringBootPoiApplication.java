@@ -29,7 +29,7 @@ public class SpringBootPoiApplication {
 		List<?> data2 =	 Arrays.asList(new String[]{"2","美丽金充值卡","名称","20","400","888"});
 		List<?> data3 =	 Arrays.asList(new String[]{"3","美丽金充值卡","名称","30","500","888"});
 
-		 String filePath="d:/test.xlsx";//文件路径
+		 String filePath="c:/test.xlsx";//文件路径
 		List<?> queryRows =  Arrays.asList( new String []{"门店：全部","支付方式：全部","本次搜索条件：全部","本次搜索条件99：全部99"} ) ;
 				//queryRows  = new ArrayList<>();
 		List<?> headerRows =	 Arrays.asList(new String[]{"排名","美丽金充值卡","名称","销售数量（订单数）","销售金额","惠z"});
@@ -119,7 +119,7 @@ public class SpringBootPoiApplication {
 				"合约期限",
 				"合约开始时间",
 				"合约到期时间",
-				"剩余时间"},rowssss);
+				"剩余时间"},rowssss,new Integer[]{5,10,15,20,25,30});
 
 
 
