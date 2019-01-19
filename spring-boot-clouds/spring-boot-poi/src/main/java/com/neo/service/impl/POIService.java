@@ -1,5 +1,6 @@
 package com.neo.service.impl;
 
+import com.neo.cost.Const;
 import com.neo.domain.SheetEntity;
 import com.neo.domain.SheetVo;
 import com.neo.util.Iterables;
@@ -7,6 +8,7 @@ import com.neo.util.Utils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,99 +18,138 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * POI service
+ */
 public class POIService {
 
-    private  void insertRow(String fontName,int fontSize ,Workbook wb,Row row, List<?> columns) {
-        if (columns != null && columns.size() > 0) {
-            Iterables.forEach(columns,(index, item)-> {
-                CellStyle cellStyle = wb.createCellStyle();
-                Cell cell = row.createCell(index);
-                cell.setCellValue(String.valueOf(item));
-                setFont(cellStyle,fontName, fontSize, false,false, wb, cell);
-            });
-        }
-    }
-    private  void  setFont(CellStyle cellStyle ,String fontName, int fontHeight,boolean isCenter, boolean boldWeightBold , Workbook workbook , Cell cell){
-        Font font = workbook.createFont();
-        font.setFontName(fontName);
-        font.setFontHeightInPoints((short)fontHeight);
-        if(isCenter) {
-            font.setBold(boldWeightBold);
-            cellStyle.setAlignment(HorizontalAlignment.CENTER);
-            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        }
-        cellStyle.setFont(font);
-        setBorderLine(cellStyle,cell);
+    /**
+     * 创建字体
+     * @param workbook
+     * @return
+     */
+    private Font  createFont(Workbook workbook ){
+       return  workbook.createFont();
     }
 
-    private void setBorderLine(CellStyle cellStyle,Cell cell){
-        cellStyle.setBorderBottom(BorderStyle.THIN); //下边框
-        cellStyle.setBorderLeft(BorderStyle.THIN);//左边框
-        cellStyle.setBorderTop(BorderStyle.THIN);//上边框
-        cellStyle.setBorderRight(BorderStyle.THIN);//右边框
+    /**
+     * 设置 边框线条
+     * @param cellStyle
+     */
+    private void setBorderLine(CellStyle cellStyle){
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
         cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
         cellStyle.setLeftBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
         cellStyle.setRightBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-        cell.setCellStyle(cellStyle);
     }
 
-    private   void   setTitle(String title,String fontName,int fontSize , Workbook workbook ,Sheet sheet,int lastCol ){
-        if(!Utils.isEmpty(title)) {
-            CellStyle cellStyle = null;
+    /**
+     * 标题样式设置
+     * @param cellStyle
+     * @param sheet
+     * @param entity
+     */
+    private   void  setTitle(CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
+        if(!Utils.isEmpty(entity.getTitle())) {
             Row row = sheet.createRow(0);
-            for (int i =0 ;i< lastCol; i++){
-                cellStyle =  workbook.createCellStyle();
-                Cell cell = row.createCell(i);
-                setFont(cellStyle,fontName, fontSize, true,true, workbook, cell);
-                setBorderLine(cellStyle,cell);
+            int  end = entity.getHeaderRow().size();
+            for (int i =0 ;i<end; i++){
+                CellUtil.createCell(row,i,"",cellStyle);
             }
-            row.getCell(0).setCellValue(title);
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, lastCol-1));
+            row.getCell(0).setCellValue(entity.getTitle());
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, end-1));
         }
     }
-    private   void setQueryRows(String fontName,int fontSize ,String title ,List<?> queryRows,Workbook workbook ,Sheet sheet, int lastCol){
-        if(null != queryRows &&  queryRows.size() > 0 ) {
+
+    /**
+     * 查询条件设置
+     * @param cellStyle
+     * @param sheet
+     * @param entity
+     */
+    private   void setQueryRows( CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
+        if(entity.getQueryRows() !=null && entity.getQueryRows().size() > 0 ) {
             int rowNum  = 0;
-            if(!Utils.isEmpty(title)) {
+            if(!Utils.isEmpty(entity.getTitle())) {
                 rowNum = rowNum +1;
             }
             String cnt = "\r\n";
             StringBuilder content = new StringBuilder();
-            queryRows.forEach(item -> {
+            entity.getQueryRows().forEach(item -> {
                 content.append(item).append(cnt);
             });
-             for(int i = 0; i< (queryRows.size()+rowNum); i ++){
+            for(int i = 0; i< ( entity.getQueryRows().size()+rowNum); i ++){
                 Row row = sheet.createRow(rowNum +i);
-                Cell cell =null;
-                for( int j = 0 ; j< lastCol ; j++){
-                    cell = row.createCell(j);
-                    CellStyle cellStyle = workbook.createCellStyle();
-                    cellStyle.setWrapText(true);
-                    setFont(cellStyle,fontName, fontSize, false,false, workbook, cell);
-                    setBorderLine(cellStyle,cell);
-                }
+                Iterables.forEach(entity.getHeaderRow(),(index, item)-> CellUtil.createCell(row,index,"",cellStyle));
             }
             sheet.getRow(rowNum).getCell(0).setCellValue(new XSSFRichTextString(content.substring(0,content.length()-2)));
-            sheet.addMergedRegion(new CellRangeAddress(rowNum, (queryRows.size()+rowNum -1), 0, lastCol-1));
+            sheet.addMergedRegion(new CellRangeAddress(rowNum, (entity.getQueryRows().size()+rowNum -1), 0, entity.getHeaderRow().size()-1));
         }
     }
 
-    private  void setHeaderRow(String fontName,int fontSize ,String title ,List<?> queryRows ,List<?> headerRows,Workbook workbook ,Sheet sheet){
-        if(headerRows!=null && headerRows.size() > 0 ){
-            int rowNum  = getStartRow(title,queryRows,null,null,null);
+    /**
+     * 设置 头部数据
+     * @param cellStyle
+     * @param sheet
+     * @param entity
+     */
+    private   void setHeaderRow(CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
+        if(!Utils.isEmpty(entity.getHeaderRow())){
+            int rowNum  = getStartRow(entity.getTitle(),entity.getQueryRows(),null,null,null);
             Row row = sheet.createRow(rowNum);
-            Iterables.forEach(headerRows,(index, item)-> {
-                CellStyle cellStyle = workbook.createCellStyle();
-                Cell cell = row.createCell(index);
-                cell.setCellValue(String.valueOf(item));
-                setFont(cellStyle,fontName, fontSize, false,false, workbook, cell);
-                setBorderLine(cellStyle,cell);
+            Iterables.forEach(entity.getHeaderRow(),(index, item)->  CellUtil.createCell(row,index,String.valueOf(item),cellStyle));
+        }
+    }
+
+    /**
+     * 插入一行数据
+     * @param cellStyle
+     * @param row
+     * @param datas
+     */
+    private   void insertRow(CellStyle cellStyle ,Row row, List<?> datas) {
+        if (datas != null && datas.size() > 0) {
+            Iterables.forEach(datas,(index, item)-> {
+                if(!Utils.isNumber(item)){
+                    CellUtil.createCell(row,index,String.valueOf(item),cellStyle);
+                }else{
+                    Cell cell = row.createCell(index);
+                    cell.setCellValue(Double.parseDouble((String)item));
+                    cell.setCellStyle(cellStyle);
+                }
             });
         }
     }
 
-    private    int getStartRow(String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow){
+    /**
+     *  插入 excel 数据
+     * @param cellStyle
+     * @param sheet
+     * @param entity
+     */
+    private   void setDatas(CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
+        if(!Utils.isEmpty(entity.getDatas())){
+            int startRow = getStartRow(entity.getTitle(),entity.getQueryRows(),entity.getHeaderRow(),null,null);
+            Iterables.forEach(entity.getDatas(),(index, item)-> {
+                insertRow(cellStyle,sheet.createRow(startRow+index),(List<?>)item);
+            });
+        }
+    }
+
+    /**
+     * 计算 插入excl 的起始行
+     * @param title
+     * @param queryRows
+     * @param headerRow
+     * @param datas
+     * @param summaryRow
+     * @return
+     */
+    private   int getStartRow(String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow){
         int startRow = 0;
         if(!Utils.isEmpty(title)) {
             startRow += 1;
@@ -127,27 +168,9 @@ public class POIService {
         }
         return startRow;
     }
-
-    private   void setDatas(String fontName,int fontSize ,String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,Workbook wb ,Sheet sheet){
-        if(!Utils.isEmpty(datas)){
-            int startRow = getStartRow(title,queryRows,headerRow,null,null);
-            for (int i = 0;  i< datas.size(); i++) {
-                insertRow(fontName,fontSize,wb,sheet.createRow(i+ startRow),(List<?>)datas.get(i));
-            }
-        }
-    }
-
-    private   void setSummaryRow(String fontName,int fontSize,String title ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow, Workbook wb , Sheet sheet){
-        if(!Utils.isEmpty(summaryRow)){
-            int startRow = getStartRow(title,queryRows,headerRow,datas,null);
-            insertRow(fontName,fontSize,wb,sheet.createRow(startRow),summaryRow);
-        }
-    }
-
-
     private   Workbook createExcel(String title,String sheetName ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow){
         SheetEntity sheetEntity = new SheetEntity(title,sheetName,queryRows,headerRow,datas,summaryRow);
-        List<SheetEntity> sheetParams = new ArrayList<>(1);
+        List<SheetEntity> sheetParams = new ArrayList<>( Const.INIT_CAPACITY);
         sheetParams.add(sheetEntity);
         return this.createExcel(sheetParams);
     }
@@ -155,97 +178,126 @@ public class POIService {
     private   Workbook createExcel(String title,String sheetName ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow,List<?> cellWidths){
         SheetEntity sheetEntity = new SheetEntity(title,sheetName,queryRows,headerRow,datas,summaryRow);
         sheetEntity.setHeaderRowCellWidths(cellWidths);
-        List<SheetEntity> sheetParams = new ArrayList<>(1);
+        List<SheetEntity> sheetParams = new ArrayList<>( Const.INIT_CAPACITY);
         sheetParams.add(sheetEntity);
         return this.createExcel(sheetParams);
     }
 
-    public static Workbook createSXSSFWorkbook() {
+    private  Workbook createSXSSFWorkbook() {
         XSSFWorkbook workbook1 = new XSSFWorkbook();
         SXSSFWorkbook sxssfWorkbook = new SXSSFWorkbook(workbook1, 100);
       return  sxssfWorkbook ;
     }
 
     /**
-     * 设置 表格列宽
+     * 设置列宽
      * @param sheet
-     * @param headers
-     * @param headerRowCellWidths
+     * @param entity
      */
-    private void autoSizeColumn(Sheet sheet,List<?> headers,List<?> headerRowCellWidths ){
-        if(!Utils.isEmpty( headers)){
-            for (int  i = 0 ;i < headers.size() ; i++){
-                int defaultWidth = 5;
-                 Integer setWidth  = defaultWidth + defaultWidth ;
-
-                 if(!Utils.isEmpty(headerRowCellWidths)){
-                     int cellWidthSize = headerRowCellWidths.size() ;
-                     if(i < cellWidthSize){
-                         Object  obj = headerRowCellWidths.get(i);
+    private void autoSizeColumn(Sheet sheet,SheetEntity entity){
+        if(!Utils.isEmpty(entity.getHeaderRow())){
+            Iterables.forEach(entity.getHeaderRow(),(index,item) ->{
+                Integer setWidth = Const.DEFAULT_WIDTH;
+                 if(!Utils.isEmpty(entity.getHeaderRowCellWidths())){
+                     int size = entity.getHeaderRowCellWidths().size();
+                     if( index < size ){
+                         Object  obj = entity.getHeaderRowCellWidths().get(index);
                          if(obj != null){
                              setWidth += (int)obj;
                          }
                      }
                  }
-                sheet.setColumnWidth(i,256*setWidth+184);
-            }
+                sheet.setColumnWidth(index,256*setWidth+184);
+            });
         }
     }
+
+    /**
+     * 创建标题 样式
+     * @param workbook
+     * @param entity
+     * @return
+     */
+    private   CellStyle createTitleCellStyle(Workbook workbook,SheetEntity entity){
+        Font font = this.createFont(workbook);
+        font.setFontName(entity.getFontName());
+        font.setFontHeightInPoints((short)entity.getTitleFontSize().intValue());
+        font.setBold(true);
+        CellStyle  style  = this.createBaseCellStyle(workbook,font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+       return style;
+    }
+
+    /***
+     * 创建 插入 excel 的 单元格样式
+     * @param workbook
+     * @param entity
+     * @return
+     */
+    private   CellStyle createDataCellStyle(Workbook workbook,SheetEntity entity){
+        Font font = this.createFont(workbook);
+        font.setFontName(entity.getFontName());
+        font.setFontHeightInPoints((short)entity.getDataFontSize().intValue());
+        return this.createBaseCellStyle(workbook,font);
+    }
+
+    /**
+     * 创建查询条件的单元格 样式
+     * @param workbook
+     * @param entity
+     * @return
+     */
+    private   CellStyle createQueryCellStyle(Workbook workbook,SheetEntity entity){
+        Font font = this.createFont(workbook);
+        font.setFontName(entity.getFontName());
+        font.setFontHeightInPoints((short)entity.getQueryFontSize().intValue());
+        CellStyle cellStyle =  this.createBaseCellStyle(workbook,font);
+        cellStyle.setWrapText(true);
+        return cellStyle;
+    }
+
+    /**
+     * 创建 公共样式
+     * @param workbook
+     * @param font
+     * @return
+     */
+    private   CellStyle createBaseCellStyle(Workbook workbook,Font font){
+        CellStyle  style  = workbook.createCellStyle();
+        style.setFont(font);
+        setBorderLine(style);
+        return style;
+    }
+
+    /**
+     *   封装 excel
+     * @param sheetParams
+     * @return
+     */
     private    Workbook createExcel(List<SheetEntity> sheetParams) {
         Workbook workbook = null;
         if (!Utils.isEmpty(sheetParams)) {
             workbook = createSXSSFWorkbook();
             Sheet sheet = null;
             for (SheetEntity sheetParam : sheetParams) {
+                //标题 样式
+                CellStyle titleStyle     =  this.createTitleCellStyle(workbook,sheetParam);
+                CellStyle queryRowStyle  =  this.createQueryCellStyle(workbook,sheetParam);
+                CellStyle dataStyle      =  this.createDataCellStyle(workbook,sheetParam);
                 if(!Utils.isEmpty(sheetParam.getSheetName())){
                     sheet = workbook.createSheet(sheetParam.getSheetName());
                 }else{
                     sheet = workbook.createSheet();
                 }
-                setTitle(sheetParam.getTitle(),sheetParam.getFontName(),sheetParam.getTitleFontSize(), workbook, sheet, sheetParam.getHeaderRow().size());
-                setQueryRows(sheetParam.getFontName(),sheetParam.getQueryFontSize(),sheetParam.getTitle(), sheetParam.getQueryRows(), workbook, sheet, sheetParam.getHeaderRow().size());
-                setHeaderRow(sheetParam.getFontName(),sheetParam.getDataFontSize(),sheetParam.getTitle(), sheetParam.getQueryRows(), sheetParam.getHeaderRow(), workbook, sheet);
-                setDatas(sheetParam.getFontName(),sheetParam.getDataFontSize(),sheetParam.getTitle(), sheetParam.getQueryRows(), sheetParam.getHeaderRow(), sheetParam.getDatas(), workbook, sheet);
-                setSummaryRow(sheetParam.getFontName(),sheetParam.getSummaryFontSize(),sheetParam.getTitle(), sheetParam.getQueryRows(), sheetParam.getHeaderRow(), sheetParam.getDatas(), sheetParam.getSummaryRow(), workbook, sheet);
-                autoSizeColumn(sheet,sheetParam.getHeaderRow(),sheetParam.getHeaderRowCellWidths());
+                setTitle(titleStyle,sheet,sheetParam);
+                setQueryRows(queryRowStyle,sheet,sheetParam);
+                setHeaderRow(dataStyle,sheet,sheetParam);
+                setDatas(dataStyle,sheet,sheetParam);
+                autoSizeColumn(sheet,sheetParam);
             }
         }
         return workbook;
-    }
-
-    public  byte[]  createExcels(String title,String sheetName ,List<?> queryRows ,List<?> headerRow,List<?> datas,List<?> summaryRow) throws Exception{
-        Workbook workbook =null;
-        ByteArrayOutputStream out  = null;
-        byte[] bytes = null;
-        try {
-            workbook = this.createExcel(title, sheetName, queryRows, headerRow, datas, summaryRow);
-            out = new ByteArrayOutputStream();
-            workbook.write(out);
-            bytes = out.toByteArray();
-        }finally {
-            if( out!=null){
-                out.close();;
-            }
-        }
-      return bytes;
-    }
-
-    public byte[] export(String[] columns, String[] rows) throws Exception {
-        List<List<?>>  datas = new ArrayList<>();
-        for (String  row : rows) {
-            String [] data = row.split(",");
-            datas.add(Utils.asList(data));
-        }
-        return this.createExcels("","",null,Utils.asList(columns),datas,null);
-    }
-
-    public byte[] export(String title,String[] columns, String[] rows) throws Exception {
-        List<List<?>>  datas = new ArrayList<>();
-        for (String  row : rows) {
-            String [] data = row.split(",");
-            datas.add(Utils.asList(data));
-        }
-        return this.createExcels(title,"",null,Utils.asList(columns),datas,null);
     }
 
     public byte[] export(List<SheetVo> list) throws Exception {
@@ -257,7 +309,7 @@ public class POIService {
             list.forEach(item ->{
                 List<List<?>>  datas = new ArrayList<>();
                 for (String  row : item.getDatas()) {
-                    String [] data = row.split(",");
+                    String [] data = row.split(Const.SPLIT_REGEX);
                     datas.add(Utils.asList(data));
                 }
                 SheetEntity  sheetEntity = new SheetEntity(item.getTitle(),item.getSheetName(),Utils.asList(item.getQueryRows()),Utils.asList(item.getHeaderRow()),datas,new ArrayList<>());
@@ -283,29 +335,14 @@ public class POIService {
         return bytes;
     }
 
-
-    public byte[] export(String title,String sheetName,String[] columns, String[] rows) throws Exception {
-        List<List<?>>  datas = new ArrayList<>();
-        for (String  row : rows) {
-            String [] data = row.split(",");
-            datas.add(Utils.asList(data));
-        }
-        return this.createExcels(title,sheetName,null,Utils.asList(columns),datas,null);
-    }
-
-
-
-
     public  Workbook demo2(String title,String sheetName,String [] queryRows,String[] columns, String[] rows,Integer[] columnsWidths) throws Exception {
         List<List<?>>  datas = new ArrayList<>();
         for (String  row : rows) {
-            String [] data = row.split(",");
+            String [] data = row.split(Const.SPLIT_REGEX);
             datas.add(Utils.asList(data));
         }
         return this.createExcel(title,sheetName,Utils.asList(queryRows),Utils.asList(columns),datas,null,Utils.asList(columnsWidths));
     }
-
-
 
 
 }

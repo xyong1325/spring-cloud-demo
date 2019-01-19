@@ -28,4 +28,18 @@ public class Utils {
             return Arrays.asList(rows);
         }
     }
+
+
+    public  static  boolean isNumber(Object str){
+        boolean  bool = true;
+        try{
+            Double.parseDouble((String) str);
+        }catch (Exception e){
+            bool = false;
+        }
+        return bool;
+    }
+
+
+
 }
