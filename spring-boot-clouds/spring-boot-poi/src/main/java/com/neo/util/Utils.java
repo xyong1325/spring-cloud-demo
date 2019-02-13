@@ -1,5 +1,7 @@
 package com.neo.util;
 
+import com.neo.cost.Const;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +31,11 @@ public class Utils {
         }
     }
 
-
+    /**
+     * 判断字符串 是否是数字（0开头的默认为字符串）
+     * @param str
+     * @return
+     */
     public  static  boolean isNumber(Object str){
         boolean  bool = true;
         try{
@@ -37,9 +43,14 @@ public class Utils {
         }catch (Exception e){
             bool = false;
         }
+        // 如果出现 字符串类型 为 00012 开头的字符串；默认处理为字符串
+       if( bool &&  ((String) str).length() > 1 ){
+           String  validNumPrefix  =  ((String) str).substring(0,2);
+           if(!validNumPrefix.contains(Const.NUMBER_DOT)){
+               bool = false;
+           }
+       }
         return bool;
     }
-
-
 
 }

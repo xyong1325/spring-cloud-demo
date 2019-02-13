@@ -17,4 +17,9 @@ public class Const {
      */
     public static final String SPLIT_REGEX = ",";
 
+    /**
+     * 数字的小数点
+     */
+    public static  final String NUMBER_DOT = ".";
+
 }

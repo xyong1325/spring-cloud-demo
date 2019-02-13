@@ -1,11 +1,14 @@
 package com.neo;
 
 import com.neo.service.impl.POIService;
+import com.neo.util.Utils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -40,10 +43,11 @@ public class SpringBootPoiApplicationTests {
 												"合约开始时间",
 												"合约到期时间",
 												"剩余时间"};
-		String [] 	datas  = new String [100000] ;
+		int size = 1000000 ;
+		String [] 	datas  = new String [size] ;
 
 
-		for (int i = 0 ; i< 100000; i++){
+		for (int i = 0 ; i< size; i++){
 			  datas[i] = (i+1) +",82965,须要科技(深圳)有限公司,深圳,提供完整项目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月,2017-12-27,2019-12-27,346天";
 		}
 		Integer[]  columnsWidths =  new Integer[]{10,10,10,10,10,10,10,10,10};
@@ -57,6 +61,21 @@ public class SpringBootPoiApplicationTests {
         int mis =  (int)(end -start)/1000 ;
 		System.out.println("执行时间 "+ mis +"s" );
 
+	}
+
+
+	@Test
+	public void test(){
+		String  str = "A0001";
+		Assert.assertEquals(false,Utils.isNumber(str));
+		str = "00001";
+		Assert.assertEquals(false,Utils.isNumber(str));
+		str = "0.0001";
+		Assert.assertEquals(true,Utils.isNumber(str));
+		str = "1.025";
+		Assert.assertEquals(true,Utils.isNumber(str));
+		str = "0.000A";
+		Assert.assertEquals(false,Utils.isNumber(str));
 	}
 }
 
