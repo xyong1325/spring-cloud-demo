@@ -49,11 +49,11 @@ public class SpringBootPoiApplicationTests {
 
 		for (int i = 0 ; i< size; i++){
 			// datas[i] = (i+1) +",82965,须要科技(深圳)有限公司,深圳,提供完整项目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月,2017-12-27,2019-12-27,346天";
-			  datas[i] = (i+1) +",82965,须要科技(深圳)有限公司,深圳,提供完整项目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月";
+			  datas[i] = (i+1) +",82965,须要科技(深圳)有限公司,深圳,提供完整项提供完整项目或提供商品提供完整项目或提供商品提供完整项目或提供商品提供完整项目或提供商品提供完整项目或提供商品目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月";
 		     // datas[i] = (i+1) +",82965,,,提供完整项目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月,2017-12-27";
 		}
 		Integer[]  columnsWidths =  new Integer[]{5,10,15,5,10,10,10,10,10};
-	//	columnsWidths  = null ;
+		columnsWidths  = null ;
 		long start = System.currentTimeMillis();
 		Workbook workbook = ipoiService.demo2(title,sheetName,queryRows,queryHeaderRows,datas,columnsWidths);
 		FileOutputStream out = new FileOutputStream(filePath);
@@ -70,7 +70,7 @@ public class SpringBootPoiApplicationTests {
 	@Test
 	public void test(){
 		String  str = "A0001";
-		Assert.assertEquals(false,Utils.isNumber(str));
+/*		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "00001";
 		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "0.0001";
@@ -78,7 +78,9 @@ public class SpringBootPoiApplicationTests {
 		str = "1.025";
 		Assert.assertEquals(true,Utils.isNumber(str));
 		str = "0.000A";
-		Assert.assertEquals(false,Utils.isNumber(str));
+		Assert.assertEquals(false,Utils.isNumber(str));*/
+		str = "696.00";
+		Assert.assertEquals(true,Utils.isNumber(str));
 	}
 }
 

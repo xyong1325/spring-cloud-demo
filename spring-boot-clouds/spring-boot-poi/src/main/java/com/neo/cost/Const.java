@@ -8,9 +8,14 @@ public class Const {
     public static  final int INIT_CAPACITY = 1;
 
     /**
-     *
+     * 默认列宽3个汉字的宽度
      */
-    public static  final int DEFAULT_WIDTH = 5 ;
+    public static  final int DEFAULT_WIDTH = 9 ;
+
+    /**
+     * 最大列宽6个汉字的宽度
+     */
+    public  static  final int MAX_WIDTH = 18;
 
     /**
      * 字符串数组 分隔符

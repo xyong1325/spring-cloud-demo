@@ -13,6 +13,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.security.auth.login.Configuration;
 import java.io.*;
 import java.util.*;
 
@@ -82,7 +83,7 @@ public class POIService {
             });
             for(int i = 0; i< ( entity.getQueryRows().size()+rowNum); i ++){
                 Row row = sheet.createRow(rowNum +i);
-                Iterables.forEach(entity.getHeaderRow(),(index, item)-> CellUtil.createCell(row,index,"",cellStyle));
+                Utils.forEach(entity.getHeaderRow(),(index, item)-> CellUtil.createCell(row,index,"",cellStyle));
             }
             sheet.getRow(rowNum).getCell(0).setCellValue(new XSSFRichTextString(content.substring(0,content.length()-2)));
             sheet.addMergedRegion(new CellRangeAddress(rowNum, (entity.getQueryRows().size()+rowNum -1), 0, entity.getHeaderRow().size()-1));
@@ -100,9 +101,16 @@ public class POIService {
             int rowNum  = getStartRow(entity.getTitle(),entity.getQueryRows(),null,null,null);
             Row row = sheet.createRow(rowNum);
             Map<Integer, Integer> finalMaxWidth = new HashMap<Integer,Integer>();
-            Iterables.forEach(entity.getHeaderRow(),(index, item)-> {
+            Utils.forEach(entity.getHeaderRow(),(index, item)-> {
                 Cell cell =  CellUtil.createCell(row,index,String.valueOf(item),cellStyle);
-                finalMaxWidth.put(index,cell.getStringCellValue().getBytes().length  * 256);
+                int maxWidth = cell.getStringCellValue().getBytes().length;
+                  if( maxWidth < Const.DEFAULT_WIDTH){
+                      maxWidth = Const.DEFAULT_WIDTH;
+                  }
+                  if( maxWidth >= Const.MAX_WIDTH){
+                      maxWidth = Const.MAX_WIDTH;
+                  }
+                finalMaxWidth.put(index,maxWidth * 256);
             });
             return finalMaxWidth;
         }else {
@@ -133,7 +141,7 @@ public class POIService {
                 }else{
                     setWidth = maxWidthMap.get(index);
                 }
-                sheet.setColumnWidth(index,setWidth);
+                sheet.setColumnWidth(index,setWidth + 200);
             });
         }
     }
@@ -145,7 +153,7 @@ public class POIService {
      */
     private   void insertRow(CellStyle cellStyle ,Row row, List<?> datas) {
         if (datas != null && datas.size() > 0) {
-            Iterables.forEach(datas,(index, item)-> {
+            Utils.forEach(datas,(index, item)-> {
                 if(!Utils.isNumber(item)){
                     CellUtil.createCell(row,index,String.valueOf(item),cellStyle);
                 }else{
@@ -166,7 +174,7 @@ public class POIService {
     private   void setDatas(CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
         if(!Utils.isEmpty(entity.getDatas())){
             int startRow = getStartRow(entity.getTitle(),entity.getQueryRows(),entity.getHeaderRow(),null,null);
-            Iterables.forEach(entity.getDatas(),(index, item)-> {
+            Utils.forEach(entity.getDatas(),(index, item)-> {
                 List<?> datas = (List<?>)item;
                 List newLit = datas;
                 if(!Utils.isEmpty(datas) && !Utils.isEmpty(entity.getHeaderRow()) && entity.getHeaderRow().size() > datas.size() ){
@@ -286,6 +294,7 @@ public class POIService {
      */
     private   CellStyle createBaseCellStyle(Workbook workbook,Font font){
         CellStyle  style  = workbook.createCellStyle();
+     //   style.setWrapText(true);
         style.setFont(font);
         setBorderLine(style);
         return style;
