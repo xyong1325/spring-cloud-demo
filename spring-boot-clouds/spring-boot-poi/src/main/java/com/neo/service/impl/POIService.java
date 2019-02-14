@@ -14,9 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * POI service
@@ -41,10 +39,10 @@ public class POIService {
         cellStyle.setBorderLeft(BorderStyle.THIN);
         cellStyle.setBorderTop(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-        cellStyle.setLeftBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-        cellStyle.setRightBorderColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+        cellStyle.setBottomBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+        cellStyle.setLeftBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+        cellStyle.setRightBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
     }
 
     /**
@@ -97,14 +95,48 @@ public class POIService {
      * @param sheet
      * @param entity
      */
-    private   void setHeaderRow(CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
+    private Map<Integer,Integer> setHeaderRow(CellStyle cellStyle , Sheet sheet, SheetEntity entity){
         if(!Utils.isEmpty(entity.getHeaderRow())){
             int rowNum  = getStartRow(entity.getTitle(),entity.getQueryRows(),null,null,null);
             Row row = sheet.createRow(rowNum);
-            Iterables.forEach(entity.getHeaderRow(),(index, item)->  CellUtil.createCell(row,index,String.valueOf(item),cellStyle));
+            Map<Integer, Integer> finalMaxWidth = new HashMap<Integer,Integer>();
+            Iterables.forEach(entity.getHeaderRow(),(index, item)-> {
+                Cell cell =  CellUtil.createCell(row,index,String.valueOf(item),cellStyle);
+                finalMaxWidth.put(index,cell.getStringCellValue().getBytes().length  * 256);
+            });
+            return finalMaxWidth;
+        }else {
+            return null;
         }
+
     }
 
+    /**
+     * 设置列宽
+     * @param sheet
+     * @param entity
+     */
+    private void autoSizeColumn(Sheet sheet,SheetEntity entity,Map<Integer,Integer> maxWidthMap){
+        if(!Utils.isEmpty(entity.getHeaderRow())){
+            Utils.forEach(entity.getHeaderRow(),(index,item) ->{
+                Integer setWidth = Const.DEFAULT_WIDTH;
+                if(!Utils.isEmpty(entity.getHeaderRowCellWidths())){
+                    int size = entity.getHeaderRowCellWidths().size();
+                    if( index < size ){
+                        Object  obj = entity.getHeaderRowCellWidths().get(index);
+                        if(obj != null){
+                            setWidth = ((int)obj * 256);
+                        }
+                    }else{
+                        setWidth = maxWidthMap.get(index);
+                    }
+                }else{
+                    setWidth = maxWidthMap.get(index);
+                }
+                sheet.setColumnWidth(index,setWidth);
+            });
+        }
+    }
     /**
      * 插入一行数据
      * @param cellStyle
@@ -135,7 +167,18 @@ public class POIService {
         if(!Utils.isEmpty(entity.getDatas())){
             int startRow = getStartRow(entity.getTitle(),entity.getQueryRows(),entity.getHeaderRow(),null,null);
             Iterables.forEach(entity.getDatas(),(index, item)-> {
-                insertRow(cellStyle,sheet.createRow(startRow+index),(List<?>)item);
+                List<?> datas = (List<?>)item;
+                List newLit = datas;
+                if(!Utils.isEmpty(datas) && !Utils.isEmpty(entity.getHeaderRow()) && entity.getHeaderRow().size() > datas.size() ){
+                    int size = entity.getHeaderRow().size() - datas.size();
+                    if(size > 0 ){
+                        newLit = new ArrayList<>(datas);
+                        for(int i = 0; i< size; i ++){
+                            newLit.add("");
+                        }
+                    }
+                }
+                insertRow(cellStyle,sheet.createRow(startRow+index),newLit);
             });
         }
     }
@@ -189,28 +232,6 @@ public class POIService {
       return  sxssfWorkbook ;
     }
 
-    /**
-     * 设置列宽
-     * @param sheet
-     * @param entity
-     */
-    private void autoSizeColumn(Sheet sheet,SheetEntity entity){
-        if(!Utils.isEmpty(entity.getHeaderRow())){
-            Iterables.forEach(entity.getHeaderRow(),(index,item) ->{
-                Integer setWidth = Const.DEFAULT_WIDTH;
-                 if(!Utils.isEmpty(entity.getHeaderRowCellWidths())){
-                     int size = entity.getHeaderRowCellWidths().size();
-                     if( index < size ){
-                         Object  obj = entity.getHeaderRowCellWidths().get(index);
-                         if(obj != null){
-                             setWidth += (int)obj;
-                         }
-                     }
-                 }
-                sheet.setColumnWidth(index,256*setWidth+184);
-            });
-        }
-    }
 
     /**
      * 创建标题 样式
@@ -292,9 +313,9 @@ public class POIService {
                 }
                 setTitle(titleStyle,sheet,sheetParam);
                 setQueryRows(queryRowStyle,sheet,sheetParam);
-                setHeaderRow(dataStyle,sheet,sheetParam);
+                Map<Integer,Integer>  maxWidthMap = setHeaderRow(dataStyle,sheet,sheetParam);
                 setDatas(dataStyle,sheet,sheetParam);
-                autoSizeColumn(sheet,sheetParam);
+                autoSizeColumn(sheet,sheetParam,maxWidthMap);
             }
         }
         return workbook;

@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 public class Utils {
 
@@ -51,6 +53,15 @@ public class Utils {
            }
        }
         return bool;
+    }
+
+    public static <E> void forEach( Iterable<? extends E> elements, BiConsumer<Integer, ? super E> action) {
+        Objects.requireNonNull(elements);
+        Objects.requireNonNull(action);
+        int index = 0;
+        for (E element : elements) {
+            action.accept(index++, element);
+        }
     }
 
 }
