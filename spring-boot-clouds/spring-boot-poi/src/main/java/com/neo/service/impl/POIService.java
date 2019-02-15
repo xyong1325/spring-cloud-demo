@@ -40,10 +40,10 @@ public class POIService {
         cellStyle.setBorderLeft(BorderStyle.THIN);
         cellStyle.setBorderTop(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
-        cellStyle.setBottomBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
-        cellStyle.setLeftBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
-        cellStyle.setRightBorderColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+        cellStyle.setTopBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT.getIndex());
+        cellStyle.setBottomBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT.getIndex());
+        cellStyle.setLeftBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT.getIndex());
+        cellStyle.setRightBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT.getIndex());
     }
 
     /**
