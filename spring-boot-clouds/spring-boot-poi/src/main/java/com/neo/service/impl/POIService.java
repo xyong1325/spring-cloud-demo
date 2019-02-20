@@ -3,7 +3,7 @@ package com.neo.service.impl;
 import com.neo.cost.Const;
 import com.neo.domain.SheetEntity;
 import com.neo.domain.SheetVo;
-import com.neo.util.Iterables;
+import com.neo.thread.PoiWriter;
 import com.neo.util.Utils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
@@ -16,6 +16,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.security.auth.login.Configuration;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * POI service
@@ -158,7 +161,7 @@ public class POIService {
                     CellUtil.createCell(row,index,String.valueOf(item),cellStyle);
                 }else{
                     Cell cell = row.createCell(index);
-                    cell.setCellValue(Double.parseDouble((String)item));
+                    cell.setCellValue(Long.valueOf((String)item));
                     cell.setCellStyle(cellStyle);
                 }
             });
@@ -190,6 +193,48 @@ public class POIService {
             });
         }
     }
+
+    /**
+     * 使用多线程 处理
+     * @param cellStyle
+     * @param sheet
+     * @param entity
+     */
+    private void setDatasThread(CellStyle cellStyle ,Sheet sheet,SheetEntity entity){
+        if(!Utils.isEmpty(entity.getDatas())){
+            int startRow = getStartRow(entity.getTitle(),entity.getQueryRows(),entity.getHeaderRow(),null,null);
+
+            int dataSize =  entity.getDatas().size();
+            int defaultRow =  1000;
+            int maxRowNum = 2;
+            int totalRow = dataSize / defaultRow  ;
+            if(totalRow > maxRowNum){
+                totalRow = maxRowNum;
+                defaultRow =  dataSize / maxRowNum;
+            }
+            int mod =  dataSize % defaultRow ;
+            totalRow = totalRow + ( mod > 0 ? 1 : 0 );
+            try{
+                ExecutorService es = Executors.newCachedThreadPool();
+                CountDownLatch doneSignal = new CountDownLatch(totalRow);
+                for(int i = 1 ; i<=  totalRow ; i ++ ){
+                    int start = ( i ==1 ? 1 : ((i- 1) * defaultRow)+1 ) ;
+                    int end = i* defaultRow ;
+                    if(mod > 0 && i == totalRow){
+                        end = 	((i- 1) * defaultRow)+ mod;
+                    }
+                    es.submit(new PoiWriter(doneSignal,sheet,(start + startRow),( end +startRow),entity,cellStyle,startRow));
+                    //  System.out.println(  i + " start " + (start + startRow) + "  end  "+ ( end +startRow) );
+                }
+                doneSignal.await();
+                es.shutdown();
+            }catch (Exception e){
+
+            }
+        }
+    }
+
+
 
     /**
      * 计算 插入excl 的起始行
@@ -323,7 +368,8 @@ public class POIService {
                 setTitle(titleStyle,sheet,sheetParam);
                 setQueryRows(queryRowStyle,sheet,sheetParam);
                 Map<Integer,Integer>  maxWidthMap = setHeaderRow(dataStyle,sheet,sheetParam);
-                setDatas(dataStyle,sheet,sheetParam);
+               setDatas(dataStyle,sheet,sheetParam);
+            // setDatasThread(dataStyle,sheet,sheetParam);
                 autoSizeColumn(sheet,sheetParam,maxWidthMap);
             }
         }

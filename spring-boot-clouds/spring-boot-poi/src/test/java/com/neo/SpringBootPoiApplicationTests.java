@@ -43,10 +43,8 @@ public class SpringBootPoiApplicationTests {
 												"合约开始时间",
 												"合约到期时间",
 												"剩余时间"};
-		int size = 100 ;
+		int size = 10005 ;
 		String [] 	datas  = new String [size] ;
-
-
 		for (int i = 0 ; i< size; i++){
 			// datas[i] = (i+1) +",82965,须要科技(深圳)有限公司,深圳,提供完整项目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月,2017-12-27,2019-12-27,346天";
 			  datas[i] = (i+1) +",82965,须要科技(深圳)有限公司,深圳,提供完整项提供完整项目或提供商品提供完整项目或提供商品提供完整项目或提供商品提供完整项目或提供商品提供完整项目或提供商品目或提供商品,盘桂元,13926828235,2018-08-02,合作中,24.0个月";
@@ -63,7 +61,6 @@ public class SpringBootPoiApplicationTests {
 		long  end = System.currentTimeMillis();
         int mis =  (int)(end -start)/1000 ;
 		System.out.println("执行时间 "+ mis +"s" );
-
 	}
 
 
@@ -81,6 +78,32 @@ public class SpringBootPoiApplicationTests {
 		Assert.assertEquals(false,Utils.isNumber(str));*/
 		str = "696.00";
 		Assert.assertEquals(true,Utils.isNumber(str));
+	}
+
+	@Test
+	public void test1(){
+		int prefixNum = 0 ;
+
+		 int datas =  7003;
+		 int defaultRow =  1000;
+		 int maxRowNum = 4;
+		 int totalRow = datas / defaultRow  ;
+		    if(totalRow > maxRowNum){
+				totalRow = maxRowNum;
+		    	defaultRow =  datas / maxRowNum;
+			}
+
+		 int mod =  datas % defaultRow ;
+		     totalRow = totalRow + ( mod > 0 ? 1 : 0 );
+		 for(int i = 1 ; i<=  totalRow ; i ++ ){
+		 	int start = ( i ==1 ? 1 : ((i- 1) * defaultRow)+1 ) ;
+		 	int end = i* defaultRow ;
+		 	if(mod > 0 && i == totalRow){
+				end = 	((i- 1) * defaultRow)+ mod;
+			}
+		 	System.out.println(  i + " start " + (start + prefixNum) + "  end  "+ ( end +prefixNum) );
+		 }
+
 	}
 }
 

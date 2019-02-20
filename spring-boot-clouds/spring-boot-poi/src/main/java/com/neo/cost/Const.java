@@ -2,6 +2,9 @@ package com.neo.cost;
 
 public class Const {
 
+
+
+
     /**
      * 数组 初始化  1
      */
