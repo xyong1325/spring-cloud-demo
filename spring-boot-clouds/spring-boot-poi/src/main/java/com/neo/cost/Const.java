@@ -30,4 +30,9 @@ public class Const {
      */
     public static  final String NUMBER_DOT = ".";
 
+    /**
+     * 数字类型的字符串前缀
+     */
+    public static  final String  NUMBER_TYPE_STRING_PREFIX = "00" ;
+
 }

@@ -67,7 +67,9 @@ public class SpringBootPoiApplicationTests {
 	@Test
 	public void test(){
 		String  str = "A0001";
-/*		Assert.assertEquals(false,Utils.isNumber(str));
+		Assert.assertEquals(false,Utils.isNumber(str));
+		str = "001A";
+		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "00001";
 		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "0.0001";
@@ -75,7 +77,7 @@ public class SpringBootPoiApplicationTests {
 		str = "1.025";
 		Assert.assertEquals(true,Utils.isNumber(str));
 		str = "0.000A";
-		Assert.assertEquals(false,Utils.isNumber(str));*/
+		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "696.00";
 		Assert.assertEquals(true,Utils.isNumber(str));
 	}
