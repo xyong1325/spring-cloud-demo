@@ -127,7 +127,7 @@ public class POIService {
      * @param sheet
      * @param entity
      */
-    private void autoSizeColumn(Sheet sheet,SheetEntity entity,Map<Integer,Integer> maxWidthMap){
+    private void autoSetColumnWidth(Sheet sheet,SheetEntity entity,Map<Integer,Integer> maxWidthMap){
         if(!Utils.isEmpty(entity.getHeaderRow())){
             Utils.forEach(entity.getHeaderRow(),(index,item) ->{
                 Integer setWidth = Const.DEFAULT_WIDTH;
@@ -161,7 +161,7 @@ public class POIService {
                     CellUtil.createCell(row,index,String.valueOf(item),cellStyle);
                 }else{
                     Cell cell = row.createCell(index);
-                    cell.setCellValue(Long.valueOf((String)item));
+                    cell.setCellValue(Double.valueOf((String)item));
                     cell.setCellStyle(cellStyle);
                 }
             });
@@ -370,7 +370,7 @@ public class POIService {
                 Map<Integer,Integer>  maxWidthMap = setHeaderRow(dataStyle,sheet,sheetParam);
                setDatas(dataStyle,sheet,sheetParam);
             // setDatasThread(dataStyle,sheet,sheetParam);
-                autoSizeColumn(sheet,sheetParam,maxWidthMap);
+                autoSetColumnWidth(sheet,sheetParam,maxWidthMap);
             }
         }
         return workbook;

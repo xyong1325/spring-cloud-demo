@@ -36,6 +36,7 @@
         <module>spring-boot-config-bus-client</module>
 
         <module>spring-boot-quartz</module>
+        <module>spring-boot-binary-system</module>
 
     </modules>
 
