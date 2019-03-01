@@ -33,6 +33,6 @@ public class Const {
     /**
      * 数字类型的字符串前缀
      */
-    public static  final String  NUMBER_TYPE_STRING_PREFIX = "00" ;
+    public static  final String  NUMBER_TYPE_STRING_PREFIX = "0" ;
 
 }

@@ -68,6 +68,14 @@ public class SpringBootPoiApplicationTests {
 	public void test(){
 		String  str = "A0001";
 		Assert.assertEquals(false,Utils.isNumber(str));
+		str = "0";
+		Assert.assertEquals(true,Utils.isNumber(str));
+		str = "1";
+		Assert.assertEquals(true,Utils.isNumber(str));
+		str = ".018";
+		Assert.assertEquals(false,Utils.isNumber(str));
+		str = "018";
+		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "001A";
 		Assert.assertEquals(false,Utils.isNumber(str));
 		str = "00001";
