@@ -47,17 +47,12 @@ public class Utils {
         }
         // 如果出现 字符串类型 为 00012 开头的字符串；默认处理为字符串
        if( bool &&  ((String) str).length() > 1 ){
-           String  validNumPrefix  =  ((String) str).substring(0,2);
-           if(Const.NUMBER_TYPE_STRING_PREFIX.equals(validNumPrefix)){
+            String  validNumPrefix  =  ((String) str).substring(0,2);
+            if( bool && Const.NUMBER_DOT.equals(String.valueOf( validNumPrefix.charAt(0)))){
+                bool = false;
+            }
+           if (bool && (!validNumPrefix.contains(Const.NUMBER_DOT)) && Const.NUMBER_TYPE_STRING_PREFIX.equals(String.valueOf( validNumPrefix.charAt(0)))) {
                bool = false;
-           }else {
-               try {
-                   Double.parseDouble(validNumPrefix);
-               } catch (Exception e) {
-                   if (!validNumPrefix.contains(Const.NUMBER_DOT)) {
-                       bool = false;
-                   }
-               }
            }
        }
         return bool;
