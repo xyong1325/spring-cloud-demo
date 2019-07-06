@@ -21,6 +21,13 @@ import java.util.Map;
  *  该类 代码存在优化空间， 暂不处理
  */
 public class XmlFactory {
+
+    /**
+     *
+     * @param excelPath  excel 路径
+     * @param xmlDir   生成的xml 的文件夹路径
+     * @throws Exception
+     */
     public static  void GenXml(String excelPath,final String xmlDir)throws  Exception{
         XmlFactory  xmlFactory  = new XmlFactory();
         xmlFactory.excelToXml(excelPath,xmlDir);
