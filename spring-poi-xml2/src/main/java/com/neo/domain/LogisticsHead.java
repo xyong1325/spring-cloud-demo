@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -12,7 +14,7 @@ import java.util.UUID;
 public class LogisticsHead{
      private   String guid = UUID.randomUUID().toString().toUpperCase();
      private  String appType = "1";
-     private  String appTime = "20190706001";
+     private  String appTime = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date(System.currentTimeMillis()));
      private  String appStatus = "2";
      private  String logisticsCode = "420198053D";
      private  String logisticsName = "湖北省快捷通国际货运代理有限公司";
